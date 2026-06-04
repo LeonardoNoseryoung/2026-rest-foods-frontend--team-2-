@@ -1,22 +1,19 @@
-import { Routes } from "react-router-dom";
+import { useNavigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import React from "react";
-import RFButtonStack from "./components/Molecules/RFButtonStack";
+import MainPage from "./Pages/MainPage";
 
 function App() {
-  const buttonStack = RFButtonStack("Menu", "Reservations");
-
+  const navigate = useNavigate();
+  const goToHome = () => {
+    navigate("/");
+  };
   return (
+    goToHome(),
     <>
-      <Routes />
-      <h1>
-        <img
-          src="https://logonoid.com/images/roger-federer-logo.png"
-          style={{ width: "200px", height: "auto" }}
-        />
-        <p>Welcome to Rest Foods!</p>
-      </h1>
-      {buttonStack}
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+      </Routes>
     </>
   );
 }

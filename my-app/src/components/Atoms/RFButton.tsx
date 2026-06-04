@@ -1,9 +1,11 @@
 import Button from "@mui/material/Button";
 
-export default function RFButton(Label: string) {
+export default function RFButton(Label: string, URL?: string) {
   return (
     <Button variant="text"
-      onClick={() => console.log("Button clicked!")}>
+    color="text.primary"
+    justifyContent="center" 
+      onClick={() => console.log(URL)}>
       {Label}
     </Button>
   );
