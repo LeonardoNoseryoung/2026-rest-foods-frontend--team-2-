@@ -1,18 +1,13 @@
-import { useNavigate, Route, Routes } from "react-router-dom";
-import "./App.css";
-import React from "react";
+import { Route, Routes } from "react-router-dom";
 import MainPage from "./Pages/MainPage";
+import MenuPage from "./Pages/MenuPage";
 
 function App() {
-  const navigate = useNavigate();
-  const goToHome = () => {
-    navigate("/");
-  };
   return (
-    goToHome(),
     <>
       <Routes>
         <Route path="/" element={<MainPage />} />
+        <Route path="/menu" element={<MenuPage />} />
       </Routes>
     </>
   );
