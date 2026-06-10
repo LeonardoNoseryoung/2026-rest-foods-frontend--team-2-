@@ -3,9 +3,10 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
-import fork from "../../assets/fork.png";
+import arrow from "../../assets/Placeholder.webp";
+        {/* arrow from "../../assets/fork.png"; */}
 
-export default function CategoryBox() {
+export default function CategoryBox(Category: string, Item: string) {
   return (
     <div>
       <Accordion
@@ -20,7 +21,7 @@ export default function CategoryBox() {
       >
         {/* Text to drop down (Category) */}
         <AccordionSummary
-          expandIcon={<img src={fork} alt="Fork" width="45" height="45" />}
+          expandIcon={<img src={arrow} alt="Arrow" width="45" height="45" />}
           aria-controls="panel1a-content"
           id="panel1a-header"
           sx={{
@@ -28,11 +29,11 @@ export default function CategoryBox() {
             borderBottom: "1px solid black",
           }}
         >
-          <Typography>Category 1</Typography>
+          <Typography>{Category}</Typography>
         </AccordionSummary>
         {/* Text to show when drop down (Menu) */}
         <AccordionDetails>
-          <Typography>Item 1</Typography>
+          <Typography>{Item}</Typography>
         </AccordionDetails>
       </Accordion>
     </div>

@@ -1,11 +1,13 @@
-import CategoryBox from '../components/Atoms/CategoryBox';
+import CategoryBoxStack from "../components/Molecules/CategoryBoxStack";
+import CategoryToggles from "../components/Molecules/CategoryToggles";
 
 function MenuPage() {
   return (
     <div>
       <h1>Menu Page</h1>
       <h2>Categories</h2>
-      <CategoryBox />
+      <CategoryToggles />
+      <CategoryBoxStack />
     </div>
   );
 }
