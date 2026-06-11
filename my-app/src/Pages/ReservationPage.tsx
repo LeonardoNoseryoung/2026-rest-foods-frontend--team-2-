@@ -52,10 +52,12 @@ function ReservationPage() {
 useEffect(() => {
     const fetchData = async () => {
         try {
-            const data = await fetchJson<Reservation[]>('/reservations');
+            const response = await fetch("http://localhost:8080/reservations");
+            const data = await response.json();
             setReservations(data);
 
-            const tablesData = await fetchJson<RestaurantTable[]>('/tables');
+            const tablesResponse = await fetch("http://localhost:8080/tables");
+            const tablesData = await tablesResponse.json();
             setTables(tablesData);
         } catch (error) {
             console.error("Fetch fehlgeschlagen:", error);
@@ -65,13 +67,13 @@ useEffect(() => {
 }, []);
 
 
-    const handleSubmit = async (values: ReservationFormValues) => {
-        try {
-            await fetchJson<Reservation>('/reservations', {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ ...values, id: selectedTable?.TableId }),
-            });
+    const handleSubmit = async (values: ReservationValues) => {
+        const response = await fetch("http://localhost:8080/reservations/", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ ...values, id: selectedTable }),
+        });
+        if (response.ok) {
             setSelectedTable(null);
         } catch (error) {
             console.error("Reservation fehlgeschlagen:", error);
