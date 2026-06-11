@@ -1,13 +1,12 @@
-import CategoryBoxStack from "../components/Molecules/CategoryBoxStack";
-import CategoryToggles from "../components/Molecules/CategoryToggles";
+
+import MenuButtonsAndPages from "../components/Organisms/MenuButtonsAndBoxes";
 
 function MenuPage() {
   return (
     <div>
       <h1>Menu Page</h1>
       <h2>Categories</h2>
-      <CategoryToggles />
-      <CategoryBoxStack />
+      <MenuButtonsAndPages />
     </div>
   );
 }

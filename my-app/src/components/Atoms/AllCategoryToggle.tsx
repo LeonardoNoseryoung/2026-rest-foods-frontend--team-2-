@@ -1,8 +1,6 @@
 import * as React from "react";
 import Placeholder from "../../assets/4thPlaceholder.jpg";
 import ToggleButton from "@mui/material/ToggleButton";
-import { Category2Toggle } from "./Category2Toggle";
-
 
 export default function StandaloneToggleButton() {
   const [selected, setSelected] = React.useState(false);
@@ -11,9 +9,7 @@ export default function StandaloneToggleButton() {
     <ToggleButton
       value="check"
       selected={selected}
-      onChange={() => setSelected((prevSelected) => !prevSelected) && Category2Toggle()}
-        
-      
+      onChange={() => setSelected((prevSelected) => !prevSelected)}
       sx={{
         "&.Mui-selected img": {
           filter: "brightness(60%)",
@@ -23,12 +19,7 @@ export default function StandaloneToggleButton() {
         },
       }}
     >
-      <img
-        src={Placeholder}
-        alt="All Categories"
-        width="55"
-        height="55"
-      />
+      <img src={Placeholder} alt="All Categories" width="55" height="55" />
     </ToggleButton>
   );
 }

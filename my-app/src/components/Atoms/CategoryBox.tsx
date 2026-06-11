@@ -4,18 +4,21 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import arrow from "../../assets/Placeholder.webp";
-        {/* arrow from "../../assets/fork.png"; */}
+{
+  /* arrow from "../../assets/fork.png"; */
+}
 
 export default function CategoryBox(Category: string, Item: string) {
   return (
+    console.log("CategoryBox rendered with Category:", Category, "and Item:", Item),
     <div>
       <Accordion
         sx={{
-          backgroundColor: 'rgba(255, 255, 255, 0.03)',
+          backgroundColor: "rgba(255, 255, 255, 0.03)",
           border: "1px solid black",
           boxShadow: "none",
           "&:before": {
-            display: "none", 
+            display: "none",
           },
         }}
       >
@@ -25,7 +28,7 @@ export default function CategoryBox(Category: string, Item: string) {
           aria-controls="panel1a-content"
           id="panel1a-header"
           sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            backgroundColor: "rgba(255, 255, 255, 0.03)",
             borderBottom: "1px solid black",
           }}
         >
