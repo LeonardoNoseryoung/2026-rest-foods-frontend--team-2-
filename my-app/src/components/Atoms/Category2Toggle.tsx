@@ -2,16 +2,16 @@ import * as React from "react";
 import Placeholder from "../../assets/3rdPlaceholder.jpg";
 import ToggleButton from "@mui/material/ToggleButton";
 
-export default function StandaloneToggleButton() {
-    const [selected, setSelected] = React.useState(false);
-    
+export default function StandaloneToggleButton({
+  selectCategory2, 
+  setSelectCategory2
+}) {
     return (
         <ToggleButton
         value="check"
-        selected={selected}
+        selected={selectCategory2}
         onChange={() => {
-            setSelected((prevSelected) => !prevSelected);
-            console.log("Category 2 toggled");
+            setSelectCategory2((prevSelected) => !prevSelected);
         }}
       sx={{
           "&.Mui-selected img": {
