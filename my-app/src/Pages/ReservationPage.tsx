@@ -25,11 +25,11 @@ function ReservationPage() {
 useEffect(() => {
     const fetchData = async () => {
         try {
-            const response = await fetch("http://localhost:8080/reservations/");
+            const response = await fetch("http://localhost:8080/reservations");
             const data = await response.json();
             setReservations(data);
 
-            const tablesResponse = await fetch("http://localhost:8080/tables/");
+            const tablesResponse = await fetch("http://localhost:8080/tables");
             const tablesData = await tablesResponse.json();
             setTables(tablesData);
         } catch (error) {
@@ -41,7 +41,7 @@ useEffect(() => {
 
 
     const handleSubmit = async (values: ReservationValues) => {
-        const response = await fetch("http://localhost:8080/reservations/", {
+        const response = await fetch("http://localhost:8080/reservations", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ ...values, id: selectedTable }),
