@@ -8,8 +8,8 @@ export default function RFMenuButton() {
       variant="text"
       color="text.primary"
       onClick={() => {
-        console.log("Navigating to /menu");
-        navigate("/menu");
+        console.log("Navigating to /ReservationPage");
+        navigate("/ReservationPage");
       }}
     >
       RESERVATIONS
