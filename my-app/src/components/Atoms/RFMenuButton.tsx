@@ -6,7 +6,7 @@ export default function RFMenuButton() {
   return (
     <Button
       variant="text"
-      color="text.primary"
+      color="primary"
       onClick={() => {
         console.log("Navigating to /menu");
         navigate("/menu");

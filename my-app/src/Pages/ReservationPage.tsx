@@ -1,7 +1,19 @@
-import React, {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import { Formik, Field, ErrorMessage } from 'formik';
 
-interface ReservationValues {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
+
+async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
+    const response = await fetch(`${API_BASE_URL}${path}`, options);
+
+    if (!response.ok) {
+        throw new Error(`${path} failed with ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
+interface ReservationFormValues {
     id: number;
     name: string;
     startTime: string;
@@ -9,8 +21,23 @@ interface ReservationValues {
     phone: string;
 }
 
+interface RestaurantTable {
+    TableId: string;
+    Chairs: number;
+}
+
+interface Reservation {
+    ReservationId: string;
+    StartingTime: string;
+    EndingTime: string;
+    AmountOfPersons: number;
+    PhoneNumber: string;
+    NameofPerson: string;
+    restaurantTable: RestaurantTable;
+}
+
 function ReservationPage() {
-    const initialValues: ReservationValues = {
+    const initialValues: ReservationFormValues = {
     id: 0,
     name: "",
     startTime: '',
@@ -18,19 +45,17 @@ function ReservationPage() {
     phone: '',
   };
 
-  const [tables, setTables] = useState<number[]>([]);
-  const [reservations, setReservations] = useState<ReservationValues[]>([]);
-  const [selectedTable, setSelectedTable] = useState<number | null>(null);
+  const [tables, setTables] = useState<RestaurantTable[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   
 useEffect(() => {
     const fetchData = async () => {
         try {
-            const response = await fetch("http://localhost:8080/reservations/");
-            const data = await response.json();
+            const data = await fetchJson<Reservation[]>('/reservations');
             setReservations(data);
 
-            const tablesResponse = await fetch("http://localhost:8080/tables/");
-            const tablesData = await tablesResponse.json();
+            const tablesData = await fetchJson<RestaurantTable[]>('/tables');
             setTables(tablesData);
         } catch (error) {
             console.error("Fetch fehlgeschlagen:", error);
@@ -40,14 +65,16 @@ useEffect(() => {
 }, []);
 
 
-    const handleSubmit = async (values: ReservationValues) => {
-        const response = await fetch("http://localhost:8080/reservations/", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ ...values, id: selectedTable }),
-        });
-        if (response.ok) {
+    const handleSubmit = async (values: ReservationFormValues) => {
+        try {
+            await fetchJson<Reservation>('/reservations', {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ ...values, id: selectedTable?.TableId }),
+            });
             setSelectedTable(null);
+        } catch (error) {
+            console.error("Reservation fehlgeschlagen:", error);
         }
     };
 
@@ -60,8 +87,8 @@ useEffect(() => {
                         <p>No tables available</p>
                     ) : (
                         tables.map((table) => (
-                            <div key={table}>
-                                <p>Table {table}</p>
+                            <div key={table.TableId}>
+                                <p>Table {table.TableId} ({table.Chairs} chairs)</p>
                                 <button onClick={() => setSelectedTable(table)}>
                                     Make Reservation
                                 </button>
@@ -71,20 +98,20 @@ useEffect(() => {
 
                     <h2>Already booked:</h2>
                     {reservations.map((res) => (
-                        <div key={res.id}>
-                            Table {res.id} — {res.startTime} bis {res.endTime}
+                        <div key={res.ReservationId}>
+                            Table {res.restaurantTable.TableId} — {res.StartingTime} bis {res.EndingTime}
                         </div>
                     ))}
                 </div>
             ) : (
                 <div>
                     <button onClick={() => setSelectedTable(null)}>Back</button>
-                    <h1>Reserve Table {selectedTable}</h1>
+                    <h1>Reserve Table {selectedTable.TableId}</h1>
 
                     <Formik
                         initialValues={initialValues}
                         validate={(values) => {
-                            const errors: Partial<ReservationValues> = {};
+                            const errors: Partial<ReservationFormValues> = {};
                             if (!values.startTime) errors.startTime = 'Required';
                             if (!values.endTime)   errors.endTime   = 'Required';
                             if (!values.name)      errors.name      = 'Required';

@@ -1,15 +1,15 @@
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 
-export default function RFMenuButton() {
+export default function RFReservationButton() {
   const navigate = useNavigate();
   return (
     <Button
       variant="text"
-      color="text.primary"
+      color="primary"
       onClick={() => {
-        console.log("Navigating to /ReservationPage");
-        navigate("/ReservationPage");
+        console.log("Navigating to /reservation");
+        navigate("/reservation");
       }}
     >
       RESERVATIONS
