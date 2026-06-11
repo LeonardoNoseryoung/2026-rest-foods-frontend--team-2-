@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Field, ErrorMessage } from 'formik';
 
 interface ReservationValues {
     id: number;
@@ -24,24 +24,27 @@ function ReservationPage() {
   
 useEffect(() => {
     const fetchData = async () => {
-        const response = await fetch("https://localhost:8080/reservations/");
-        const data = await response.json();
-        setReservations(data);
+        try {
+            const response = await fetch("http://localhost:8080/reservations/");
+            const data = await response.json();
+            setReservations(data);
 
-        
-        const tablesResponse = await fetch("https://localhost:8080/tables/");
-        const tablesData = await tablesResponse.json();
-        setTables(tablesData);
+            const tablesResponse = await fetch("http://localhost:8080/tables/");
+            const tablesData = await tablesResponse.json();
+            setTables(tablesData);
+        } catch (error) {
+            console.error("Fetch fehlgeschlagen:", error);
+        }
     };
     fetchData();
 }, []);
 
 
     const handleSubmit = async (values: ReservationValues) => {
-        const response = await fetch("https://localhost:8080/reservations/", {
+        const response = await fetch("http://localhost:8080/reservations/", {
             method: "POST",
-            headers: {"Content-Type": "application/json"}, // sagt: was ich dir schicke ist JSON
-            body: JSON.stringify({ ...values, id: selectedTable }), //Reservations Daten werden ans Backend geschickt
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ ...values, id: selectedTable }),
         });
         if (response.ok) {
             setSelectedTable(null);
@@ -53,14 +56,18 @@ useEffect(() => {
             {selectedTable === null ? (
                 <div>
                   <h1>Reservations</h1>
-                    {tables.map((table) => (
-                        <div key={table}>
-                            <p>Table {table}</p>
-                            <button onClick={() => setSelectedTable(table)}>
-                                Make Reservation
-                            </button>
-                        </div>
-                    ))}
+                    {tables.length === 0 ? (
+                        <p>No tables available</p>
+                    ) : (
+                        tables.map((table) => (
+                            <div key={table}>
+                                <p>Table {table}</p>
+                                <button onClick={() => setSelectedTable(table)}>
+                                    Make Reservation
+                                </button>
+                            </div>
+                        ))
+                    )}
 
                     <h2>Already booked:</h2>
                     {reservations.map((res) => (

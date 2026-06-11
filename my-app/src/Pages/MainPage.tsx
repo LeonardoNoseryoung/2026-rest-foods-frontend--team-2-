@@ -1,6 +1,7 @@
 import { Box, Container } from "@mui/material";
 import RFMainButtonStack from "../components/Molecules/RFMainButtonStack";
 
+
 export default function MainPage() {
   const buttonStack = RFMainButtonStack();
   return (
