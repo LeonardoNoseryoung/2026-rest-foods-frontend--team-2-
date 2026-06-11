@@ -67,14 +67,16 @@ useEffect(() => {
 }, []);
 
 
-    const handleSubmit = async (values: ReservationValues) => {
+    const handleSubmit = async (values: ReservationFormValues) => {
+        try {
         const response = await fetch("http://localhost:8080/reservations/", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ ...values, id: selectedTable }),
         });
-        if (response.ok) {
+        if (response.ok){
             setSelectedTable(null);
+        }
         } catch (error) {
             console.error("Reservation fehlgeschlagen:", error);
         }
