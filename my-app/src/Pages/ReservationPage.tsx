@@ -24,12 +24,12 @@ function ReservationPage() {
   
 useEffect(() => {
     const fetchData = async () => {
-        const response = await fetch("// Da chumt Backend URL");
+        const response = await fetch("https://localhost:8080/reservations/");
         const data = await response.json();
         setReservations(data);
 
         
-        const tablesResponse = await fetch("// Da chumt Backend URL");
+        const tablesResponse = await fetch("https://localhost:8080/tables/");
         const tablesData = await tablesResponse.json();
         setTables(tablesData);
     };
@@ -38,10 +38,10 @@ useEffect(() => {
 
 
     const handleSubmit = async (values: ReservationValues) => {
-        const response = await fetch("// Da chumt Backend URL", {
+        const response = await fetch("https://localhost:8080/reservations/", {
             method: "POST",
-            headers: {"Content-Type": "application/json"}, // sagt: ws ich dir schicke ist JSOn
-            body: JSON.stringify({ ...values, id: selectedTable }), //Reservations Datn werden ans Backend geschickt
+            headers: {"Content-Type": "application/json"}, // sagt: was ich dir schicke ist JSON
+            body: JSON.stringify({ ...values, id: selectedTable }), //Reservations Daten werden ans Backend geschickt
         });
         if (response.ok) {
             setSelectedTable(null);
