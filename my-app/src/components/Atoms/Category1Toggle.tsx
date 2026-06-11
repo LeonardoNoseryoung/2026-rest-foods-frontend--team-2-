@@ -1,4 +1,3 @@
-import * as React from "react";
 import Placeholder from "../../assets/2ndPlaceholder.jpg";
 import ToggleButton from "@mui/material/ToggleButton";
 
