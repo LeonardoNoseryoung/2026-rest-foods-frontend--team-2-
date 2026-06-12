@@ -139,9 +139,9 @@ useEffect(() => {
                     {tables.length === 0 ? (
                         <p>No tables available</p>
                     ) : (
-                        tables.map((table) => (
-                            <div key={getTableId(table)}>
-                                <p>Table {getTableId(table)} ({getChairs(table)} chairs)</p>
+                        tables.map((table, index) => (
+                        <div key={getTableId(table)}>
+                            <p>Table {index + 1} ({getChairs(table)} chairs)</p>
                                 <button onClick={() => {
                                     setReservationFeedback('');
                                     setSelectedTable(table);
@@ -155,14 +155,14 @@ useEffect(() => {
                     <h2>Already booked:</h2>
                     {reservations.map((res) => (
                         <div key={res.reservationId ?? res.ReservationId}>
-                            Table {getTableId(res.restaurantTable)} — {res.startingTime ?? res.StartingTime} bis {res.endingTime ?? res.EndingTime}
+                            Table {tables.findIndex(t => getTableId(t) === getTableId(res.restaurantTable)) + 1} — {res.startingTime ?? res.StartingTime} bis {res.endingTime ?? res.EndingTime}
                         </div>
                     ))}
                 </div>
             ) : (
                 <div>
                     <button onClick={() => setSelectedTable(null)}>Back</button>
-                    <h1>Reserve Table {getTableId(selectedTable)}</h1>
+                    <h1>Reserve Table {tables.findIndex(t => getTableId(t) === getTableId(selectedTable)) + 1}</h1>
                     {reservationFeedback && (
                         <p role="status">{reservationFeedback}</p>
                     )}
