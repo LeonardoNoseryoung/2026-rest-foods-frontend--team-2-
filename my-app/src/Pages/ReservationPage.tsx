@@ -59,10 +59,6 @@ function toBackendDateTime(value: string): string {
     return value.length === 16 ? `${value}:00` : value;
 }
 
-function formatShortUuid(id: string): string {
-    return id ? id.slice(0, 8) : 'Unknown';
-}
-
 function formatReservationTime(start: string, end: string): string {
     const startDate = new Date(start);
     const endDate = new Date(end);
@@ -279,15 +275,14 @@ useEffect(() => {
                             <p className="empty-state">No tables available</p>
                         ) : (
                             <div className="table-grid">
-                                {tables.map((table) => {
+                                {tables.map((table, index) => {
                                     const tableId = getTableId(table);
 
                                     return (
                                         <article className="table-card" key={tableId}>
                                             <div>
                                                 <span className="card-label">Table</span>
-                                                <strong>{formatShortUuid(tableId)}</strong>
-                                                <code className="compact-id" title={tableId}>{tableId}</code>
+                                                <strong>{index + 1}</strong>
                                             </div>
                                             <p className="chair-count">{getChairs(table) ?? '?'} chairs</p>
                                             <button onClick={() => {
@@ -318,13 +313,13 @@ useEffect(() => {
                                     const tableId = getTableId(res.restaurantTable);
                                     const start = getStartingTime(res);
                                     const end = getEndingTime(res);
+                                    const tableIndex = tables.findIndex(t => getTableId(t) === tableId);
 
                                     return (
                                         <article className="reservation-item" key={reservationId}>
                                             <div>
                                                 <span className="card-label">Table</span>
-                                                <strong>{formatShortUuid(tableId)}</strong>
-                                                <code className="compact-id" title={tableId}>{tableId}</code>
+                                                <strong>{tableIndex >= 0 ? tableIndex + 1 : '?'}</strong>
                                             </div>
                                             <time dateTime={start}>{formatReservationTime(start, end)}</time>
                                         </article>
@@ -342,10 +337,7 @@ useEffect(() => {
                     }}>Back</button>
                     <header className="page-header">
                         <p className="eyebrow">Selected table</p>
-                        <h1>Table {formatShortUuid(getTableId(selectedTable))}</h1>
-                        <code className="compact-id" title={getTableId(selectedTable)}>
-                            {getTableId(selectedTable)}
-                        </code>
+                        <h1>Table {tables.findIndex(t => getTableId(t) === getTableId(selectedTable)) + 1}</h1>
                     </header>
                     {reservationFeedback && (
                         <p className="feedback-message" role="status">{reservationFeedback}</p>
