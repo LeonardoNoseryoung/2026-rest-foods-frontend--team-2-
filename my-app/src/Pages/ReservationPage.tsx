@@ -33,6 +33,8 @@ interface Reservation {
     restaurantTable: RestaurantTable;
 }
 
+type AvailabilityStatus = 'idle' | 'checking' | 'available' | 'unavailable' | 'error';
+
 function getTableId(table: RestaurantTable): string {
     return table.tableId ?? table.TableId ?? '';
 }
@@ -83,6 +85,80 @@ function formatReservationTime(start: string, end: string): string {
     return `${date} | ${time.format(startDate)} - ${time.format(endDate)}`;
 }
 
+function hasValidTimeRange(start: string, end: string): boolean {
+    return Boolean(start && end && new Date(start).getTime() < new Date(end).getTime());
+}
+
+async function isTableAvailable(table: RestaurantTable, start: string, end: string): Promise<boolean> {
+    const params = new URLSearchParams({
+        start: toBackendDateTime(start),
+        end: toBackendDateTime(end),
+    });
+    const response = await fetch(`http://localhost:8080/tables?${params.toString()}`);
+
+    if (!response.ok) {
+        throw new Error(`Availability check failed with ${response.status} ${response.statusText}`);
+    }
+
+    const availableTables = await response.json() as RestaurantTable[];
+    const selectedTableId = getTableId(table);
+
+    return availableTables.some((availableTable) => getTableId(availableTable) === selectedTableId);
+}
+
+function ReservationAvailabilityCheck({
+    startTime,
+    endTime,
+    selectedTable,
+    onStatusChange,
+}: {
+    startTime: string;
+    endTime: string;
+    selectedTable: RestaurantTable;
+    onStatusChange: (status: AvailabilityStatus) => void;
+}) {
+    useEffect(() => {
+        let isCurrentCheck = true;
+
+        if (!hasValidTimeRange(startTime, endTime)) {
+            onStatusChange('idle');
+            return;
+        }
+
+        onStatusChange('checking');
+
+        const timeoutId = window.setTimeout(async () => {
+            try {
+                const available = await isTableAvailable(selectedTable, startTime, endTime);
+
+                if (isCurrentCheck) {
+                    onStatusChange(available ? 'available' : 'unavailable');
+                }
+            } catch (error) {
+                if (isCurrentCheck) {
+                    onStatusChange('error');
+                }
+                console.error("Availability check fehlgeschlagen:", error);
+            }
+        }, 300);
+
+        return () => {
+            isCurrentCheck = false;
+            window.clearTimeout(timeoutId);
+        };
+    }, [startTime, endTime, selectedTable, onStatusChange]);
+
+    return null;
+}
+
+function getAvailabilityMessage(status: AvailabilityStatus): string {
+    if (status === 'checking') return 'Checking table availability...';
+    if (status === 'available') return 'This table is available for the selected time.';
+    if (status === 'unavailable') return 'This table is already booked at the selected time.';
+    if (status === 'error') return 'Could not check availability. Please try again.';
+    return 'Enter a valid start and end time to check availability.';
+}
+
 function ReservationPage() {
     const initialValues: ReservationFormValues = {
     name: "Max Muster",
@@ -96,6 +172,7 @@ function ReservationPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [reservationFeedback, setReservationFeedback] = useState<string>('');
+  const [availabilityStatus, setAvailabilityStatus] = useState<AvailabilityStatus>('idle');
   
 useEffect(() => {
     const fetchData = async () => {
@@ -121,6 +198,7 @@ useEffect(() => {
     ) => {
         if (!selectedTable) return;
         setReservationFeedback('Submitting reservation...');
+        setSubmitting(true);
 
         const reservation = {
             startingTime: toBackendDateTime(values.startTime),
@@ -135,6 +213,14 @@ useEffect(() => {
         const temporaryReservationId = crypto.randomUUID();
 
         try {
+            const tableAvailable = await isTableAvailable(selectedTable, values.startTime, values.endTime);
+
+            if (!tableAvailable) {
+                setAvailabilityStatus('unavailable');
+                setReservationFeedback('This table is not available at the selected time.');
+                return;
+            }
+
             const response = await fetch("http://localhost:8080/reservations", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -142,6 +228,7 @@ useEffect(() => {
             });
             if (response.ok){
                 setReservationFeedback('Reservation submitted successfully.');
+                setAvailabilityStatus('idle');
                 setSelectedTable(null);
                 setReservations((currentReservations) => [
                     ...currentReservations,
@@ -205,6 +292,7 @@ useEffect(() => {
                                             <p className="chair-count">{getChairs(table) ?? '?'} chairs</p>
                                             <button onClick={() => {
                                                 setReservationFeedback('');
+                                                setAvailabilityStatus('idle');
                                                 setSelectedTable(table);
                                             }}>
                                                 Make Reservation
@@ -248,7 +336,10 @@ useEffect(() => {
                 </>
             ) : (
                 <section className="reservation-form-panel">
-                    <button className="secondary-button" onClick={() => setSelectedTable(null)}>Back</button>
+                    <button className="secondary-button" onClick={() => {
+                        setAvailabilityStatus('idle');
+                        setSelectedTable(null);
+                    }}>Back</button>
                     <header className="page-header">
                         <p className="eyebrow">Selected table</p>
                         <h1>Table {formatShortUuid(getTableId(selectedTable))}</h1>
@@ -269,12 +360,21 @@ useEffect(() => {
                             if (!values.name)      errors.name      = 'Required';
                             if (!values.phone)     errors.phone     = 'Required';
                             if (!values.amountOfPersons) errors.amountOfPersons = 'Required';
+                            if (values.startTime && values.endTime && !hasValidTimeRange(values.startTime, values.endTime)) {
+                                errors.endTime = 'End time must be after start time';
+                            }
                             return errors;
                         }}
                         onSubmit={handleSubmit}
                     >
-                        {({ handleSubmit, isSubmitting }) => (
+                        {({ handleSubmit, isSubmitting, values }) => (
                             <form className="reservation-form" onSubmit={handleSubmit}>
+                                <ReservationAvailabilityCheck
+                                    startTime={values.startTime}
+                                    endTime={values.endTime}
+                                    selectedTable={selectedTable}
+                                    onStatusChange={setAvailabilityStatus}
+                                />
                                 <div className="form-field">
                                     <label>From</label>
                                     <Field type="datetime-local" name="startTime" />
@@ -300,8 +400,15 @@ useEffect(() => {
                                     <Field type="number" min="1" name="amountOfPersons" />
                                     <ErrorMessage className="field-error" component="span" name="amountOfPersons" />
                                 </div>
-                                <button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting ? 'Submitting...' : 'Reserve'}
+                                <p className={`availability-message ${availabilityStatus}`} role="status">
+                                    {getAvailabilityMessage(availabilityStatus)}
+                                </p>
+                                <button
+                                    className={`reserve-button ${availabilityStatus}`}
+                                    type="submit"
+                                    disabled={isSubmitting || availabilityStatus !== 'available'}
+                                >
+                                    {isSubmitting ? 'Submitting...' : 'Reservate'}
                                 </button>
                             </form>
                         )}

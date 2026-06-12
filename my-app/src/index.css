@@ -260,6 +260,52 @@ code {
   justify-self: start;
 }
 
+.availability-message {
+  grid-column: 1 / -1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+}
+
+.availability-message.available {
+  border-color: #86efac;
+  color: #166534;
+  background: #dcfce7;
+}
+
+.availability-message.unavailable,
+.availability-message.error {
+  border-color: #fca5a5;
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.availability-message.checking {
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.reserve-button.available {
+  background: #16a34a;
+}
+
+.reserve-button.available:hover {
+  background: #15803d;
+}
+
+.reserve-button.unavailable,
+.reserve-button.error {
+  background: #dc2626;
+}
+
+.reserve-button.checking,
+.reserve-button.idle {
+  background: #94a3b8;
+}
+
 .form-field {
   display: grid;
   gap: 6px;
