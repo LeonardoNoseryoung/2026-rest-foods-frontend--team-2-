@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Formik, Field, ErrorMessage } from 'formik';
 import type { FormikHelpers } from 'formik';
+import { useNavigate } from 'react-router-dom';
 
 interface ReservationFormValues {
     name: string;
@@ -169,7 +170,8 @@ function ReservationPage() {
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [reservationFeedback, setReservationFeedback] = useState<string>('');
   const [availabilityStatus, setAvailabilityStatus] = useState<AvailabilityStatus>('idle');
-  
+  const navigate = useNavigate();
+
 useEffect(() => {
     const fetchData = async () => {
         try {
@@ -286,9 +288,7 @@ useEffect(() => {
                                             </div>
                                             <p className="chair-count">{getChairs(table) ?? '?'} chairs</p>
                                             <button onClick={() => {
-                                                setReservationFeedback('');
-                                                setAvailabilityStatus('idle');
-                                                setSelectedTable(table);
+                                                navigate(`/tables/${tableId}`);
                                             }}>
                                                 Make Reservation
                                             </button>
