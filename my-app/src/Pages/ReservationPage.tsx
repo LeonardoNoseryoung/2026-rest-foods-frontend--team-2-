@@ -219,7 +219,7 @@ useEffect(() => {
                     <section className="reservation-section">
                         <div className="section-heading">
                             <h2>Booked reservations</h2>
-                            <p>Current reservations sorted as returned by the backend.</p>
+                            <p>Current reservations</p>
                         </div>
                         {reservations.length === 0 ? (
                             <p className="empty-state">No reservations booked yet.</p>
