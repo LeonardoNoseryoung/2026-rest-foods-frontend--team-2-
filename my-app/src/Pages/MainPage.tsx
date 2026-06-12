@@ -5,15 +5,15 @@ import RFMainButtonStack from "../components/Molecules/RFMainButtonStack";
 export default function MainPage() {
   const buttonStack = RFMainButtonStack();
   return (
-    <Box>
-      <h1>
+    <Box className="main-page">
+      <header className="brand-header">
         <img
+          className="brand-icon"
           src="https://logonoid.com/images/roger-federer-logo.png"
-          style={{ width: "200px", height: "auto" }}
+          alt="Rest Foods icon"
         />
-
-        <p>Welcome to Rest Foods!</p>
-      </h1>
+        <h1>Welcome to Rest Foods!</h1>
+      </header>
       <Container
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
       >

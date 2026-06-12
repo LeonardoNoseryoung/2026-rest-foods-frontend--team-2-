@@ -140,8 +140,6 @@ function MenuPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [newItemDraft, setNewItemDraft] = useState<MenuItemDraft>(emptyItemDraft);
-  const [editingItemId, setEditingItemId] = useState<string>("");
-  const [editDraft, setEditDraft] = useState<MenuItemDraft>(emptyItemDraft);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [itemsLoading, setItemsLoading] = useState(false);
   const [requestBusy, setRequestBusy] = useState(false);
@@ -206,7 +204,6 @@ function MenuPage() {
 
   useEffect(() => {
     loadMenuItems(selectedCategoryId);
-    setEditingItemId("");
   }, [loadMenuItems, selectedCategoryId]);
 
   const handleCreateCategory = async () => {
@@ -225,24 +222,6 @@ function MenuPage() {
       if (createdCategory?.id) {
         setSelectedCategoryId(createdCategory.id);
       }
-    } catch (error) {
-      setErrorMessage(getRequestErrorMessage(error));
-    } finally {
-      setRequestBusy(false);
-    }
-  };
-
-  const handleDeleteCategory = async (categoryId: string) => {
-    setRequestBusy(true);
-    setErrorMessage("");
-    setStatusMessage("");
-
-    try {
-      await requestJson<void>(`/menu_category/${categoryId}`, {
-        method: "DELETE",
-      });
-      setStatusMessage("Menu deleted.");
-      await loadCategories();
     } catch (error) {
       setErrorMessage(getRequestErrorMessage(error));
     } finally {
@@ -271,64 +250,6 @@ function MenuPage() {
       });
       setNewItemDraft(emptyItemDraft);
       setStatusMessage("Menu item created.");
-      await loadMenuItems(selectedCategoryId);
-    } catch (error) {
-      setErrorMessage(getRequestErrorMessage(error));
-    } finally {
-      setRequestBusy(false);
-    }
-  };
-
-  const handleStartEdit = (item: MenuItem) => {
-    setEditingItemId(item.id);
-    setEditDraft({
-      name: item.name,
-      chefsChoice: item.chefsChoice,
-      vegetarian: item.vegetarian,
-      meat: item.meat,
-      fish: item.fish,
-    });
-  };
-
-  const handleSaveEdit = async (itemId: string) => {
-    if (!selectedCategoryId) return;
-    if (!editDraft.name.trim()) {
-      setErrorMessage("Menu item name is required.");
-      return;
-    }
-
-    setRequestBusy(true);
-    setErrorMessage("");
-    setStatusMessage("");
-
-    try {
-      await requestJson<MenuItem>(`/menu_category/${selectedCategoryId}/menu-item/${itemId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...editDraft, name: editDraft.name.trim() }),
-      });
-      setEditingItemId("");
-      setStatusMessage("Menu item updated.");
-      await loadMenuItems(selectedCategoryId);
-    } catch (error) {
-      setErrorMessage(getRequestErrorMessage(error));
-    } finally {
-      setRequestBusy(false);
-    }
-  };
-
-  const handleDeleteMenuItem = async (itemId: string) => {
-    if (!selectedCategoryId) return;
-
-    setRequestBusy(true);
-    setErrorMessage("");
-    setStatusMessage("");
-
-    try {
-      await requestJson<void>(`/menu_category/${selectedCategoryId}/menu-item/${itemId}`, {
-        method: "DELETE",
-      });
-      setStatusMessage("Menu item deleted.");
       await loadMenuItems(selectedCategoryId);
     } catch (error) {
       setErrorMessage(getRequestErrorMessage(error));
@@ -385,13 +306,6 @@ function MenuPage() {
                     <strong>Menu {index + 1}</strong>
                     <code className="compact-id" title={category.id}>{category.id}</code>
                   </button>
-                  <button
-                    className="danger-button"
-                    onClick={() => handleDeleteCategory(category.id)}
-                    disabled={requestBusy}
-                  >
-                    Delete
-                  </button>
                 </article>
               ))}
             </div>
@@ -430,8 +344,6 @@ function MenuPage() {
                   <p className="empty-state">This category has no menu items.</p>
                 ) : (
                   menuItems.map((item) => {
-                    const isEditing = editingItemId === item.id;
-
                     return (
                       <article className="menu-item-card" key={item.id}>
                         <div className="menu-item-header">
@@ -440,45 +352,14 @@ function MenuPage() {
                             <strong>{item.name}</strong>
                             <code className="compact-id" title={item.id}>{item.id}</code>
                           </div>
-                          <div className="menu-item-actions">
-                            {isEditing ? (
-                              <>
-                                <button onClick={() => handleSaveEdit(item.id)} disabled={requestBusy}>
-                                  Save
-                                </button>
-                                <button
-                                  className="secondary-button"
-                                  onClick={() => setEditingItemId("")}
-                                  disabled={requestBusy}
-                                >
-                                  Cancel
-                                </button>
-                              </>
-                            ) : (
-                              <button onClick={() => handleStartEdit(item)} disabled={requestBusy}>
-                                Edit
-                              </button>
-                            )}
-                            <button
-                              className="danger-button"
-                              onClick={() => handleDeleteMenuItem(item.id)}
-                              disabled={requestBusy}
-                            >
-                              Delete
-                            </button>
-                          </div>
                         </div>
 
-                        {isEditing ? (
-                          <MenuItemFields draft={editDraft} onChange={setEditDraft} />
-                        ) : (
-                          <div className="boolean-badge-list">
-                            <BooleanBadge active={item.chefsChoice} label="Chef's Choice" />
-                            <BooleanBadge active={item.vegetarian} label="Vegetarian" />
-                            <BooleanBadge active={item.meat} label="Meat" />
-                            <BooleanBadge active={item.fish} label="Fish" />
-                          </div>
-                        )}
+                        <div className="boolean-badge-list">
+                          <BooleanBadge active={item.chefsChoice} label="Chef's Choice" />
+                          <BooleanBadge active={item.vegetarian} label="Vegetarian" />
+                          <BooleanBadge active={item.meat} label="Meat" />
+                          <BooleanBadge active={item.fish} label="Fish" />
+                        </div>
                       </article>
                     );
                   })

@@ -4,7 +4,7 @@ import RFReservationButton from "../Atoms/RFReservationButton";
 
 export default function RFMainButtonStack() {
   return (
-    <Stack direction="row" justifyContent="center" width="100%">
+    <Stack direction="row" sx={{ justifyContent: "center", width: "100%" }}>
       <RFMenuButton />
       <RFReservationButton />
     </Stack>

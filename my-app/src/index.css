@@ -116,6 +116,26 @@ code {
   margin: 0 auto;
 }
 
+.main-page {
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+  padding: 48px 24px;
+}
+
+.brand-header {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  text-align: center;
+}
+
+.brand-icon {
+  width: min(200px, 48vw);
+  height: auto;
+  display: block;
+}
+
 .reservation-page {
   display: grid;
   gap: 32px;
@@ -384,10 +404,6 @@ code {
 }
 
 .category-list-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: stretch;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 8px;
